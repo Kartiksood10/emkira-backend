@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface ProjectRepo extends JpaRepository<Project, Long> {
 
+    // Optional as project may not exist
     Optional<Project> findByName(String projectName);
 }
