@@ -1,6 +1,6 @@
-### Program Management Platform Backend
+## Program Management Platform Backend
 
-## Tech Stack
+### Tech Stack
 Java 23
 Springboot
 PostgreSQL Database
