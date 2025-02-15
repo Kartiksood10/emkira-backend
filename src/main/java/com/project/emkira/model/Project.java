@@ -3,6 +3,9 @@ package com.project.emkira.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +25,8 @@ public class Project {
 
         COMPANY_MANAGED, TEAM_MANAGED
     }
+
+    private String manager;
 
     public Long getId() {
         return id;
@@ -55,5 +60,27 @@ public class Project {
         this.manager = manager;
     }
 
-    private String manager;
+    public List<Sprint> getSprints() {
+        return sprints;
+    }
+
+    public void setSprints(List<Sprint> sprints) {
+        this.sprints = sprints;
+    }
+
+    public List<Epic> getEpics() {
+        return epics;
+    }
+
+    public void setEpics(List<Epic> epics) {
+        this.epics = epics;
+    }
+
+    // One project contains multiple sprints and epics
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Sprint> sprints = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Epic> epics = new ArrayList<>();
+
 }
