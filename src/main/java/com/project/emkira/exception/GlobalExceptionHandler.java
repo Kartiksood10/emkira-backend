@@ -10,7 +10,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProjectNotFoundException.class)
     public ResponseEntity<String> handleProjectNotFoundException(ProjectNotFoundException ex) {
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(UserEnrolledException.class)
+    public ResponseEntity<String> handleUserEnrolledException(UserEnrolledException ex) {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
 }
 

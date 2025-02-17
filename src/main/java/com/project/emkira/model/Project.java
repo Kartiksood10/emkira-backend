@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -16,6 +18,7 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -76,11 +79,22 @@ public class Project {
         this.epics = epics;
     }
 
+    public List<ProjectUser> getProjectUsers() {
+        return projectUsers;
+    }
+
+    public void setProjectUsers(List<ProjectUser> projectUsers) {
+        this.projectUsers = projectUsers;
+    }
+
     // One project contains multiple sprints and epics
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sprint> sprints = new ArrayList<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Epic> epics = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project")
+    List<ProjectUser> projectUsers = new ArrayList<>();
 
 }

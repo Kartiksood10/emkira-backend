@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor
@@ -20,13 +19,32 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
     private String password;
 
-//    @ManyToOne
-//    @JoinColumn(name="project_id")
-//    private Project project;
+    @Column(nullable = false, unique = true)
+    private String accountName;
+
+    @OneToMany(mappedBy = "user")
+    List<ProjectUser> projectUsers = new ArrayList<>();
+
+    public List<ProjectUser> getProjectUsers() {
+        return projectUsers;
+    }
+
+    public void setProjectUsers(List<ProjectUser> projectUsers) {
+        this.projectUsers = projectUsers;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
 
     public Long getId() {
         return id;

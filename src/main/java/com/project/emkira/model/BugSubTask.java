@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "bugsubtasks")
+@Table(name = "bug_subtasks")
 public class BugSubTask {
 
     @Id
