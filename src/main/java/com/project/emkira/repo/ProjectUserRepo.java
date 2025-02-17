@@ -9,10 +9,8 @@ import java.util.Optional;
 @Repository
 public interface ProjectUserRepo extends JpaRepository<ProjectUser, Long> {
 
-    ProjectUser findByUserId(Long userId);
-    ProjectUser findByProjectId(Long projectId);
-
     // returns project user for combination of userId and projectId from project_user table
+    // Equivalent SQL - Select * from project_user where user_id = userId AND project_id = projectId
     Optional<ProjectUser> findByUserIdAndProjectId(Long userId, Long projectId);
 
 }
