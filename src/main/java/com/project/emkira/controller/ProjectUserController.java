@@ -1,13 +1,11 @@
 package com.project.emkira.controller;
 
 import com.project.emkira.dto.ProjectUserRequest;
-import com.project.emkira.model.ProjectUser;
 import com.project.emkira.service.ProjectUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/project-user")
@@ -35,5 +33,11 @@ public class ProjectUserController {
     public List<String> getUsernamesByProjectId(@PathVariable("projectId") Long projectId) {
 
         return projectUserService.getAccountNamesByProjectId(projectId);
+    }
+
+    @GetMapping("/{projectId}/userCount")
+    public Long getUserCountByProjectId(@PathVariable("projectId") Long projectId) {
+
+        return projectUserService.getUserCountByProjectId(projectId);
     }
 }

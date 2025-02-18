@@ -24,4 +24,7 @@ public interface ProjectUserRepo extends JpaRepository<ProjectUser, Long> {
     @Query("SELECT pu.user.accountName FROM ProjectUser pu WHERE pu.project.id = :projectId")
     List<String> findAllAccountNamesByProjectId(Long projectId);
 
+    @Query("SELECT COUNT(pu.user.id) FROM ProjectUser pu WHERE pu.project.id = :projectId")
+    Long findUserCountByProjectId(Long projectId);
+
 }

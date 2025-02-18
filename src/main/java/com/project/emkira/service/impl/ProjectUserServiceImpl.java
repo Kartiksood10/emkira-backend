@@ -81,5 +81,16 @@ public class ProjectUserServiceImpl implements ProjectUserService {
         return projectUserRepo.findAllAccountNamesByProjectId(projectId);
     }
 
+    @Override
+    public Long getUserCountByProjectId(Long projectId) {
+
+        if(projectRepo.findById(projectId).isEmpty()){
+
+            throw new ProjectNotFoundException("Project not found");
+        }
+
+        return projectUserRepo.findUserCountByProjectId(projectId);
+    }
+
 }
 

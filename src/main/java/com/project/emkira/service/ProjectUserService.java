@@ -1,9 +1,6 @@
 package com.project.emkira.service;
 
-import com.project.emkira.model.ProjectUser;
-
 import java.util.List;
-import java.util.Optional;
 
 public interface ProjectUserService {
 
@@ -12,4 +9,6 @@ public interface ProjectUserService {
     List<Long> getUserIdsByProjectId(Long projectId);
 
     List<String> getAccountNamesByProjectId(Long projectId);
+
+    Long getUserCountByProjectId(Long projectId);
 }
