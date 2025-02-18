@@ -2,6 +2,7 @@ package com.project.emkira.service.impl;
 
 import com.project.emkira.dto.LoginRequest;
 import com.project.emkira.dto.LoginResponse;
+import com.project.emkira.exception.UserAlreadyExistsException;
 import com.project.emkira.model.User;
 import com.project.emkira.repo.UserRepo;
 import com.project.emkira.service.JwtService;
@@ -32,7 +33,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerUser(User user) {
 
-        user.setEmail(user.getEmail());
+        if(userRepo.findByEmail(user.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException("User with this email ID already exists!");
+        }
+
+        if(userRepo.findByAccountName(user.getAccountName()).isPresent()) {
+            throw new UserAlreadyExistsException("User with this account name already exists!");
+        }
+
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
