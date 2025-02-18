@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface UserRepo extends JpaRepository<User, Long> {
 
     // Optional as the email may not be present in DB
-    // Used when value might be null
+    // Optional is used when At most one value is returned and could be null
+    // Not used in List such as Optional<List<>> as List can be returned empty
     Optional<User> findByEmail(String email);
 }

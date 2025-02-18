@@ -13,6 +13,7 @@ import com.project.emkira.service.ProjectUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -56,6 +57,28 @@ public class ProjectUserServiceImpl implements ProjectUserService {
         projectUserRepo.save(projectUser);
         return "User enrolled successfully!";
 
+    }
+
+    @Override
+    public List<Long> getUserIdsByProjectId(Long projectId) {
+
+        if(projectRepo.findById(projectId).isEmpty()){
+
+            throw new ProjectNotFoundException("Project not found");
+        }
+
+        return projectUserRepo.findAllUserIdsByProjectId(projectId);
+    }
+
+    @Override
+    public List<String> getAccountNamesByProjectId(Long projectId) {
+
+        if(projectRepo.findById(projectId).isEmpty()){
+
+            throw new ProjectNotFoundException("Project not found");
+        }
+
+        return projectUserRepo.findAllAccountNamesByProjectId(projectId);
     }
 
 }
