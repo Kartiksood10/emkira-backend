@@ -1,5 +1,6 @@
 package com.project.emkira.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -95,6 +96,7 @@ public class Project {
     private List<Epic> epics = new ArrayList<>();
 
     @OneToMany(mappedBy = "project")
+    @JsonManagedReference
     List<ProjectUser> projectUsers = new ArrayList<>();
 
 }

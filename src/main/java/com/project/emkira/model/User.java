@@ -1,5 +1,6 @@
 package com.project.emkira.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class User implements UserDetails {
     private String accountName;
 
     @OneToMany(mappedBy = "user")
+    @JsonBackReference // Prevents recursion by stopping serialization
     List<ProjectUser> projectUsers = new ArrayList<>();
 
     public List<ProjectUser> getProjectUsers() {

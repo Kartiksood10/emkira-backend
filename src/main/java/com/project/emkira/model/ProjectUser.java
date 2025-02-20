@@ -1,5 +1,7 @@
 package com.project.emkira.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,10 +17,12 @@ public class ProjectUser {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonManagedReference // Allows serialization
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
+    @JsonBackReference // Prevents recursion in project
     private Project project;
 
     @Enumerated(EnumType.STRING)
