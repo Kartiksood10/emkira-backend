@@ -17,12 +17,12 @@ public class ProjectUser {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonManagedReference // Allows serialization
+    @JsonManagedReference // Allows serialization, we want user details in ProjectUser
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
-    @JsonBackReference // Prevents recursion in project
+    @JsonBackReference // Prevents recursion in project, Do not need Project details in ProjectUser
     private Project project;
 
     @Enumerated(EnumType.STRING)
