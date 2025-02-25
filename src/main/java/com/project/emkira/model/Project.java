@@ -1,6 +1,6 @@
 package com.project.emkira.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -90,13 +90,15 @@ public class Project {
 
     // One project contains multiple sprints and epics
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Not part of the JSON response body
     private List<Sprint> sprints = new ArrayList<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Epic> epics = new ArrayList<>();
 
     @OneToMany(mappedBy = "project")
-    @JsonManagedReference
+    @JsonIgnore
     List<ProjectUser> projectUsers = new ArrayList<>();
 
 }
