@@ -32,5 +32,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
+    @ExceptionHandler(TypeNotFoundException.class)
+    public ResponseEntity<String> handleTypeNotFoundException(TypeNotFoundException ex) {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
 }
 
