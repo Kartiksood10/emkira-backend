@@ -2,6 +2,7 @@ package com.project.emkira.service.impl;
 
 
 import com.project.emkira.exception.ProjectNotFoundException;
+import com.project.emkira.exception.TypeNotFoundException;
 import com.project.emkira.model.Project;
 import com.project.emkira.repo.ProjectRepo;
 import com.project.emkira.service.ProjectService;
@@ -62,5 +63,16 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectRepo.save(existingProject);
     }
+
+    @Override
+    public List<String> getProjectByManager(String manager) {
+        return projectRepo.findProjectByManager(manager);
+    }
+
+    @Override
+    public List<String> getProjectByType(Project.Type type) {
+        return projectRepo.findProjectByType(type);
+    }
+
 
 }

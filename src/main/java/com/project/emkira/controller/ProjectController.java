@@ -48,4 +48,16 @@ public class ProjectController {
         return projectService.updateProject(id, project);
     }
 
+    @GetMapping("/manager/{managerName}")
+    public List<String> getProjectsByManager(@PathVariable String managerName) {
+
+        return projectService.getProjectByManager(managerName);
+    }
+
+    @GetMapping("/type/{typeName}")
+    public List<String> getProjectsByType(@PathVariable Project.Type typeName) {
+
+        return projectService.getProjectByType(typeName);
+    }
+
 }

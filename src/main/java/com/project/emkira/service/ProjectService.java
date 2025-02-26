@@ -16,4 +16,8 @@ public interface ProjectService {
 
     Project updateProject(Long id, Project projectDetails);
 
+    List<String> getProjectByManager(String manager);
+
+    List<String> getProjectByType(Project.Type type);
+
 }
