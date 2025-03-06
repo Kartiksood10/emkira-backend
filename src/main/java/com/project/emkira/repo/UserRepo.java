@@ -2,6 +2,7 @@ package com.project.emkira.repo;
 
 import com.project.emkira.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -15,4 +16,7 @@ public interface UserRepo extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     Optional<User> findByAccountName(String accountName);
+
+    @Query("SELECT u.accountName FROM User u WHERE u.id = :userId")
+    Optional<String> findAccountNameById(Long userId);
 }

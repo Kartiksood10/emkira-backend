@@ -1,17 +1,16 @@
 package com.project.emkira.controller;
 
-import com.project.emkira.dto.LoginRequest;
-import com.project.emkira.dto.LoginResponse;
-import com.project.emkira.model.User;
 import com.project.emkira.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/user")
 public class UserController {
 
     private final UserService userService;
@@ -21,14 +20,10 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    public User registerUser(@RequestBody User user) {
+    @GetMapping("/{userId}")
+    public Optional<String> getAccountNameByUserId(@PathVariable Long userId) {
 
-        return userService.registerUser(user);
+        return userService.getAccountNameById(userId);
     }
 
-    @PostMapping("/login")
-    public LoginResponse loginUser(@RequestBody LoginRequest loginRequest) {
-        return userService.loginUser(loginRequest);
-    }
 }

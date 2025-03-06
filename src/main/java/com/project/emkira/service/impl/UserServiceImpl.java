@@ -3,6 +3,7 @@ package com.project.emkira.service.impl;
 import com.project.emkira.dto.LoginRequest;
 import com.project.emkira.dto.LoginResponse;
 import com.project.emkira.exception.UserAlreadyExistsException;
+import com.project.emkira.exception.UserNotFoundException;
 import com.project.emkira.model.User;
 import com.project.emkira.repo.UserRepo;
 import com.project.emkira.service.JwtService;
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -65,6 +68,17 @@ public class UserServiceImpl implements UserService {
         return new LoginResponse()
                 .setToken(jwtToken)
                 .setExpiresIn(jwtService.getExpirationTime());
+    }
+
+    @Override
+    public Optional<String> getAccountNameById(Long id) {
+
+        if(userRepo.findById(id).isPresent()) {
+
+            return userRepo.findAccountNameById(id);
+        }
+
+        throw new UserNotFoundException("User not found");
     }
 }
 
