@@ -1,9 +1,7 @@
 package com.project.emkira.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,7 +27,7 @@ public class User implements UserDetails {
     private String accountName;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference // Prevents recursion by stopping serialization
+    // @JsonBackReference - Prevents recursion by stopping serialization
     List<ProjectUser> projectUsers = new ArrayList<>();
 
     public List<ProjectUser> getProjectUsers() {

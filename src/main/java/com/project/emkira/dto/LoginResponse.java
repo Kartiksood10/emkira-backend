@@ -7,6 +7,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponse {
 
+    // Response when user logs in
+    // return new LoginResponse()
+    // .setToken(jwtToken) (jwtToken = jwtService.generateToken())
+    // .setExpiresIn(jwtService.getExpirationTime());
+    // {"token":"", expiresIn:""}
+
     private String token;
     private long expiresIn;
         // Getter for token

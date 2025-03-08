@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Table(name="projects")
 public class Project {
 
@@ -29,62 +30,6 @@ public class Project {
     }
 
     private String manager;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public String getManager() {
-        return manager;
-    }
-
-    public void setManager(String manager) {
-        this.manager = manager;
-    }
-
-    public List<Sprint> getSprints() {
-        return sprints;
-    }
-
-    public void setSprints(List<Sprint> sprints) {
-        this.sprints = sprints;
-    }
-
-    public List<Epic> getEpics() {
-        return epics;
-    }
-
-    public void setEpics(List<Epic> epics) {
-        this.epics = epics;
-    }
-
-    public List<ProjectUser> getProjectUsers() {
-        return projectUsers;
-    }
-
-    public void setProjectUsers(List<ProjectUser> projectUsers) {
-        this.projectUsers = projectUsers;
-    }
 
     // One project contains multiple sprints and epics
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
