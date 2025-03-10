@@ -6,6 +6,8 @@ import com.project.emkira.service.EpicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/epics")
 public class EpicController {
@@ -22,5 +24,11 @@ public class EpicController {
     public Epic addEpic(@RequestBody EpicRequest epicRequest) {
 
         return epicService.addEpic(epicRequest);
+    }
+
+    @GetMapping("/projects/{projectId}")
+    public List<Epic> getProjectById(@PathVariable Long projectId) {
+
+        return epicService.getProjectById(projectId);
     }
 }
