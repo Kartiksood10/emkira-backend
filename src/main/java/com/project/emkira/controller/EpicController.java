@@ -44,4 +44,10 @@ public class EpicController {
 
         return epicService.deleteEpic(epicId);
     }
+
+    @GetMapping("/priority/{priority}")
+    public List<Epic> getEpicByPriority(@PathVariable Epic.Priority priority) {
+
+        return epicService.getEpicByPriority(priority);
+    }
 }

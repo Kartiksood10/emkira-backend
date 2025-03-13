@@ -11,4 +11,7 @@ public interface EpicRepo extends JpaRepository<Epic, Long> {
 
     // SELECT * FROM Epic WHERE id = projectId
     List<Epic> findByProjectId(Long projectId);
+
+    // SELECT * FROM Epic WHERE priority = "" Epic.Priority as enum type
+    List<Epic> findEpicByPriority(Epic.Priority priority);
 }

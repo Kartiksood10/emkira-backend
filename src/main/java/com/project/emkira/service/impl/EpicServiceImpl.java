@@ -131,4 +131,10 @@ public class EpicServiceImpl implements EpicService {
         return "Epic deleted successfully";
     }
 
+    @Override
+    public List<Epic> getEpicByPriority(Epic.Priority priority) {
+
+        return epicRepo.findEpicByPriority(priority);
+    }
+
 }

@@ -15,4 +15,6 @@ public interface EpicService {
     Epic updateEpicStatus(Long epicId, EpicStatusRequest request);
 
     String deleteEpic(Long epicId);
+
+    List<Epic> getEpicByPriority(Epic.Priority priority);
 }
