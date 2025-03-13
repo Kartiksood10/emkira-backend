@@ -29,7 +29,7 @@ public class Epic {
 
     public enum Status {
 
-        NEW, TO_DO, IN_PROGRESS, DONE
+        NEW, TO_DO, IN_PROGRESS, DONE, CANCELLED
     }
 
     private String comment;
