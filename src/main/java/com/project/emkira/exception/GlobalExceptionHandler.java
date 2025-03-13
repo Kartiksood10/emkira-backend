@@ -35,7 +35,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TypeNotFoundException.class)
     public ResponseEntity<String> handleTypeNotFoundException(TypeNotFoundException ex) {
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(EpicNotFoundException.class)
+    public ResponseEntity<String> handleEpicNotFoundException(EpicNotFoundException ex) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
 }

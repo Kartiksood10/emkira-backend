@@ -1,6 +1,8 @@
 package com.project.emkira.service.impl;
 
 import com.project.emkira.dto.EpicRequest;
+import com.project.emkira.dto.EpicStatusRequest;
+import com.project.emkira.exception.EpicNotFoundException;
 import com.project.emkira.exception.ProjectNotFoundException;
 import com.project.emkira.exception.UserNotFoundException;
 import com.project.emkira.model.Epic;
@@ -98,6 +100,17 @@ public class EpicServiceImpl implements EpicService {
     public List<Epic> getProjectById(Long projectId) {
 
         return epicRepo.findByProjectId(projectId);
+    }
+
+    @Override
+    public Epic updateEpicStatus(Long epicId, EpicStatusRequest request) {
+
+        Epic epic = epicRepo.findById(epicId).
+                orElseThrow(() -> new EpicNotFoundException("Epic not found"));
+
+        epic.setStatus(request.getStatus());
+
+        return epicRepo.save(epic);
     }
 
 }
