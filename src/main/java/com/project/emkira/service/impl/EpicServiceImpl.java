@@ -105,12 +105,20 @@ public class EpicServiceImpl implements EpicService {
     @Override
     public Epic updateEpicStatus(Long epicId, EpicStatusRequest request) {
 
-        Epic epic = epicRepo.findById(epicId).
-                orElseThrow(() -> new EpicNotFoundException("Epic not found"));
+        try{
+            Epic epic = epicRepo.findById(epicId).
+                    orElseThrow(() -> new EpicNotFoundException("Epic not found"));
 
-        epic.setStatus(request.getStatus());
+            epic.setStatus(request.getStatus());
 
-        return epicRepo.save(epic);
+            return epicRepo.save(epic);
+        } catch(Exception e){
+
+            logger.error(e.getMessage());
+        }
+
+        return null;
+
     }
 
     @Override
