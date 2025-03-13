@@ -13,4 +13,6 @@ public interface EpicService {
     List<Epic> getProjectById(Long projectId);
 
     Epic updateEpicStatus(Long epicId, EpicStatusRequest request);
+
+    String deleteEpic(Long epicId);
 }

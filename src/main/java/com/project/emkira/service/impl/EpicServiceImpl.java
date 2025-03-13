@@ -113,4 +113,14 @@ public class EpicServiceImpl implements EpicService {
         return epicRepo.save(epic);
     }
 
+    @Override
+    public String deleteEpic(Long epicId) {
+
+        epicRepo.findById(epicId).
+                orElseThrow(() -> new EpicNotFoundException("Epic not found"));
+
+        epicRepo.deleteById(epicId);
+        return "Epic deleted successfully";
+    }
+
 }

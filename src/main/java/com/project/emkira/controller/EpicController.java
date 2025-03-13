@@ -38,4 +38,10 @@ public class EpicController {
 
         return epicService.updateEpicStatus(epicId, request);
     }
+
+    @DeleteMapping("/delete/{epicId}")
+    public String deleteEpic(@PathVariable Long epicId) {
+
+        return epicService.deleteEpic(epicId);
+    }
 }
