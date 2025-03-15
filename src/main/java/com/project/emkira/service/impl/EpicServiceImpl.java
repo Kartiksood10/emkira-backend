@@ -137,4 +137,10 @@ public class EpicServiceImpl implements EpicService {
         return epicRepo.findEpicByPriority(priority);
     }
 
+    @Override
+    public List<Epic> getEpicByStatus(Epic.Status status) {
+
+        return epicRepo.findEpicByStatus(status);
+    }
+
 }

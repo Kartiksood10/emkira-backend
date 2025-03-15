@@ -50,4 +50,10 @@ public class EpicController {
 
         return epicService.getEpicByPriority(priority);
     }
+
+    @GetMapping("/status/{status}")
+    public List<Epic> getEpicByStatus(@PathVariable Epic.Status status) {
+
+        return epicService.getEpicByStatus(status);
+    }
 }
