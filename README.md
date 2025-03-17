@@ -1,4 +1,4 @@
-## Program Management Platform Backend
+## Project Management Platform Backend
 
 ### Tech Stack
 Java 23 <br>
