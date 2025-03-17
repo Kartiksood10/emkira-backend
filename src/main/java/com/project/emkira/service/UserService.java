@@ -8,9 +8,11 @@ import java.util.Optional;
 
 public interface UserService {
 
-    public User registerUser(User user);
+    User registerUser(User user);
 
-    public LoginResponse loginUser(LoginRequest loginRequest);
+    LoginResponse loginUser(LoginRequest loginRequest);
 
-    public Optional<String> getAccountNameById(Long id);
+    Optional<String> getAccountNameById(Long id);
+
+    Optional<String> getEmailByAccountName(String accountName);
 }

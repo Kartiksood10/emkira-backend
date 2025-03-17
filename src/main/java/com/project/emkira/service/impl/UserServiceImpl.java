@@ -80,6 +80,18 @@ public class UserServiceImpl implements UserService {
 
         throw new UserNotFoundException("User not found");
     }
+
+    @Override
+    public Optional<String> getEmailByAccountName(String accountName) {
+
+        if(userRepo.findByAccountName(accountName).isEmpty()) {
+
+            throw new UserNotFoundException("User not found");
+        }
+        return userRepo.findEmailByAccountName(accountName);
+    }
+
+
 }
 
 
