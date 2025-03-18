@@ -2,14 +2,12 @@ package com.project.emkira.service.impl;
 
 
 import com.project.emkira.exception.ProjectNotFoundException;
-import com.project.emkira.exception.TypeNotFoundException;
 import com.project.emkira.model.Project;
 import com.project.emkira.repo.ProjectRepo;
 import com.project.emkira.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLOutput;
 import java.util.List;
 
 @Service
