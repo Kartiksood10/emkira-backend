@@ -1,5 +1,6 @@
 package com.project.emkira.service;
 
+import com.project.emkira.exception.ProjectNotFoundException;
 import com.project.emkira.model.Project;
 import com.project.emkira.repo.ProjectRepo;
 import com.project.emkira.service.impl.ProjectServiceImpl;
@@ -9,6 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -56,5 +60,39 @@ public class ProjectServiceImplTest {
         // verify that save() was called exactly once
         verify(projectRepo, times(1)).save(any(Project.class));
 
+    }
+
+    @Test
+    void testGetProjectByName(){
+
+        // Mock repo
+        // Optional.of since findByName is Optional and may return null
+        // To avoid null pointer exception while testing
+        when(projectRepo.findByName(project.getName())).thenReturn(Optional.of(project));
+
+        // Call service function
+        Project foundProject = projectServiceImpl.getProjectByName(project.getName());
+
+        assertNotNull(foundProject);
+        assertEquals(project.getName(), foundProject.getName());
+        assertEquals(project.getManager(), foundProject.getManager());
+        assertEquals(project.getType(), foundProject.getType());
+        // verify findByName is called only once
+        verify(projectRepo, times(1)).findByName(project.getName());
+    }
+
+    @Test
+    void testGetProjectByNameNotFound(){
+
+        // Defining a random project name which mocks not being in DB
+        String invalidProjectName = "Invalid Project";
+
+        // Mocking the repo where if the project name is invalidProjectName(not present in DB) then return empty
+        when(projectRepo.findByName(invalidProjectName)).thenReturn(Optional.empty());
+
+        // Throw exception when project not found
+        assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.getProjectByName(invalidProjectName));
+
+        verify(projectRepo, times(1)).findByName(invalidProjectName);
     }
 }
