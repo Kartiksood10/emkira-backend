@@ -16,6 +16,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+// Writing Unit test cases 3 steps:
+// Arrange (mock behavior) -> Mocking repository functions using when().thenReturn()
+// Act (call method) -> Service method is called
+// Assert (verify output or exception) -> assert and verify is applied
 
 @ExtendWith(MockitoExtension.class)
 public class ProjectServiceImplTest {
@@ -94,5 +98,35 @@ public class ProjectServiceImplTest {
         assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.getProjectByName(invalidProjectName));
 
         verify(projectRepo, times(1)).findByName(invalidProjectName);
+    }
+
+    @Test
+    void testDeleteProjectById(){
+
+        // check if project exists and return true since it is inside if condition in service method
+        when(projectRepo.existsById(1L)).thenReturn(true);
+
+        String result = projectServiceImpl.deleteProjectById(1L);
+
+        assertEquals("Project with id '" + 1L + "' deleted successfully", result);
+
+        verify(projectRepo, times(1)).existsById(1L);
+    }
+
+    @Test
+    void testDeleteProjectByIdNotFound(){
+
+        Long invalidProjectId = 999L;
+
+        when(projectRepo.existsById(invalidProjectId)).thenReturn(false);
+
+        String result = projectServiceImpl.deleteProjectById(invalidProjectId);
+
+        assertEquals("Project with id '" + invalidProjectId + "' not found", result);
+
+        // existsById is called once to check if project exists
+        verify(projectRepo, times(1)).existsById(invalidProjectId);
+        // deleteById is not called since deletion cannot occur for project that does not exist
+        verify(projectRepo, times(0)).deleteById(invalidProjectId);
     }
 }
