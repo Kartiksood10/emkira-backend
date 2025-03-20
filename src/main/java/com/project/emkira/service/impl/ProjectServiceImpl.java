@@ -44,10 +44,8 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepo.deleteById(id);
             return "Project with id '" + id + "' deleted successfully";
         }
-        else{
-            return "Project with id '" + id + "' not found";
-        }
 
+        throw new ProjectNotFoundException("Project with id '" + id + "' not found");
     }
 
     @Override
