@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -123,5 +124,43 @@ public class ProjectServiceImplTest {
         assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.deleteProjectById(invalidProjectId));
 
         verify(projectRepo, never()).deleteById(invalidProjectId);
+    }
+
+    @Test
+    void testUpdateProject(){
+
+        Long projectId = 1L;
+        // arraylist for list of sprints, epics, and projectUsers defined in the model class
+        Project existingProject = new Project(projectId, "Old Name", Project.Type.COMPANY_MANAGED, "Old Manager", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        Project updatedDetails = new Project(projectId, "New Name", Project.Type.TEAM_MANAGED, "New Manager", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+
+        // get existing project when finding by id
+        when(projectRepo.findById(projectId)).thenReturn(Optional.of(existingProject));
+        // when save is used, set updated project details
+        when(projectRepo.save(any(Project.class))).thenReturn(updatedDetails);
+
+        Project result = projectServiceImpl.updateProject(projectId, updatedDetails);
+
+        assertNotNull(result);
+        assertEquals(updatedDetails.getName(), result.getName());
+        assertEquals(updatedDetails.getManager(), result.getManager());
+        assertEquals(updatedDetails.getType(), result.getType());
+
+        verify(projectRepo, times(1)).findById(projectId);
+        verify(projectRepo, times(1)).save(any(Project.class));
+    }
+
+    @Test
+    void testUpdateProjectNotFound(){
+
+        Long invalidProjectId = 999L;
+        Project updatedDetails = new Project(invalidProjectId, "Updated Name", Project.Type.TEAM_MANAGED,
+                "Updated Manager", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+
+        when(projectRepo.findById(invalidProjectId)).thenReturn(Optional.empty());
+
+        assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.updateProject(invalidProjectId, updatedDetails));
+
+        verify(projectRepo, never()).save(any(Project.class));
     }
 }
