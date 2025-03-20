@@ -120,13 +120,8 @@ public class ProjectServiceImplTest {
 
         when(projectRepo.existsById(invalidProjectId)).thenReturn(false);
 
-        String result = projectServiceImpl.deleteProjectById(invalidProjectId);
+        assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.deleteProjectById(invalidProjectId));
 
-        assertEquals("Project with id '" + invalidProjectId + "' not found", result);
-
-        // existsById is called once to check if project exists
-        verify(projectRepo, times(1)).existsById(invalidProjectId);
-        // deleteById is not called since deletion cannot occur for project that does not exist
-        verify(projectRepo, times(0)).deleteById(invalidProjectId);
+        verify(projectRepo, never()).deleteById(invalidProjectId);
     }
 }
