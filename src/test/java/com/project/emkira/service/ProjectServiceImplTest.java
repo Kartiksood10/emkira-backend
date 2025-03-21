@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -162,5 +163,25 @@ public class ProjectServiceImplTest {
         assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.updateProject(invalidProjectId, updatedDetails));
 
         verify(projectRepo, never()).save(any(Project.class));
+    }
+
+    @Test
+    void testGetProjectByManager(){
+
+        String manager = "Manager";
+        List<String> projects = new ArrayList<>();
+        projects.add("Project 1");
+        projects.add("Project 2");
+
+        when(projectRepo.findProjectByManager(manager)).thenReturn(projects);
+
+        List<String> result = projectServiceImpl.getProjectByManager(manager);
+
+        assertNotNull(result);
+        // assertEquals would compare both list objects, assertIterable checks both list elements
+        // if order of elements in list are different then assertEquals fails but assertIterable passes
+        assertIterableEquals(projects, result);
+
+        verify(projectRepo, times(1)).findProjectByManager(manager);
     }
 }
