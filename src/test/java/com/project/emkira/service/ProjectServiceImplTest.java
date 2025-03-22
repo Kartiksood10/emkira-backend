@@ -152,6 +152,26 @@ public class ProjectServiceImplTest {
     }
 
     @Test
+    void testUpdateProjectSameData(){
+
+        Long projectId = 1L;
+        Project sameProject = new Project(projectId, "Old Name", Project.Type.COMPANY_MANAGED, "Old Manager", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+
+        when(projectRepo.findById(projectId)).thenReturn(Optional.of(sameProject));
+        when(projectRepo.save(any(Project.class))).thenReturn(sameProject);
+
+        Project result = projectServiceImpl.updateProject(projectId, sameProject);
+
+        assertNotNull(result);
+        assertEquals(sameProject.getName(), result.getName());
+        assertEquals(sameProject.getManager(), result.getManager());
+        assertEquals(sameProject.getType(), result.getType());
+
+        verify(projectRepo, times(1)).findById(projectId);
+        verify(projectRepo, times(1)).save(any(Project.class));
+    }
+
+    @Test
     void testUpdateProjectNotFound(){
 
         Long invalidProjectId = 999L;
