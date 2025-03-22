@@ -184,4 +184,40 @@ public class ProjectServiceImplTest {
 
         verify(projectRepo, times(1)).findProjectByManager(manager);
     }
+
+    @Test
+    void testGetProjectByCompanyManagedType(){
+
+        List<String> projects = new ArrayList<>();
+        projects.add("project 1");
+        projects.add("project 2");
+
+        when(projectRepo.findProjectByType(Project.Type.COMPANY_MANAGED)).thenReturn(projects);
+
+        List<String> result = projectServiceImpl.getProjectByType(Project.Type.COMPANY_MANAGED);
+
+        assertNotNull(result);
+        assertIterableEquals(projects, result);
+
+        verify(projectRepo, times(1)).findProjectByType(Project.Type.COMPANY_MANAGED);
+
+    }
+
+    @Test
+    void testGetProjectByTeamManagedType(){
+
+        List<String> projects = new ArrayList<>();
+        projects.add("project 1");
+        projects.add("project 2");
+
+        when(projectRepo.findProjectByType(Project.Type.TEAM_MANAGED)).thenReturn(projects);
+
+        List<String> result = projectServiceImpl.getProjectByType(Project.Type.TEAM_MANAGED);
+
+        assertNotNull(result);
+        assertIterableEquals(projects, result);
+
+        verify(projectRepo, times(1)).findProjectByType(Project.Type.TEAM_MANAGED);
+
+    }
 }
