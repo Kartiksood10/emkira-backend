@@ -206,6 +206,22 @@ public class ProjectServiceImplTest {
     }
 
     @Test
+    void testGetProjectByManagerNotFound(){
+
+        String manager = "New Manager";
+
+        when(projectRepo.findProjectByManager(manager)).thenReturn(new ArrayList<>());
+
+        List<String> result = projectServiceImpl.getProjectByManager(manager);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(projectRepo, times(1)).findProjectByManager(manager);
+
+    }
+
+    @Test
     void testGetProjectByCompanyManagedType(){
 
         List<String> projects = new ArrayList<>();
