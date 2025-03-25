@@ -61,4 +61,46 @@ public class ProjectUserServiceImplTest {
         projectUser.setRole(ProjectUser.Role.DEVELOPER);
     }
 
+    @Test
+    void testEnrollUserInProject(){
+
+        when(projectRepo.findById(project.getId())).thenReturn(Optional.of(project));
+
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
+
+        // Ensure the user is NOT already enrolled
+        when(projectUserRepo.findByUserIdAndProjectId(user.getId(), project.getId())).thenReturn(Optional.empty());
+
+        when(projectUserRepo.save(any(ProjectUser.class))).thenReturn(projectUser);
+
+        String result = projectUserServiceImpl.enrollUserInProject(project.getId(), user.getId(), "DEVELOPER");
+
+        assertNotNull(result);
+        assertEquals("User enrolled successfully!", result);
+
+        verify(projectRepo, times(1)).findById(project.getId());
+        verify(userRepo, times(1)).findById(user.getId());
+        verify(projectUserRepo, times(1)).findByUserIdAndProjectId(user.getId(), project.getId());
+        verify(projectUserRepo, times(1)).save(any(ProjectUser.class));
+
+    }
+
+    @Test
+    void testUserEnrolledInProject(){
+
+        when(projectRepo.findById(project.getId())).thenReturn(Optional.of(project));
+
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
+
+        when(projectUserRepo.findByUserIdAndProjectId(user.getId(), project.getId())).thenReturn(Optional.of(projectUser));
+
+        assertThrows(UserEnrolledException.class, () -> projectUserServiceImpl.enrollUserInProject(project.getId(), user.getId(), "DEVELOPER"));
+
+        verify(projectRepo, times(1)).findById(project.getId());
+        verify(userRepo, times(1)).findById(user.getId());
+        verify(projectUserRepo, times(1)).findByUserIdAndProjectId(user.getId(), project.getId());
+        verify(projectUserRepo, never()).save(any(ProjectUser.class));
+
+    }
+
 }
