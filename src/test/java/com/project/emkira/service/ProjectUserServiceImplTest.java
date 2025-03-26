@@ -1,5 +1,6 @@
 package com.project.emkira.service;
 
+import com.project.emkira.exception.ProjectNotFoundException;
 import com.project.emkira.exception.UserEnrolledException;
 import com.project.emkira.model.Project;
 import com.project.emkira.model.ProjectUser;
@@ -15,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -101,6 +104,37 @@ public class ProjectUserServiceImplTest {
         verify(projectUserRepo, times(1)).findByUserIdAndProjectId(user.getId(), project.getId());
         verify(projectUserRepo, never()).save(any(ProjectUser.class));
 
+    }
+
+    @Test
+    void testGetUserIdsByProjectId(){
+
+        List<Long> userIds = new ArrayList<>();
+        userIds.add(1L);
+        userIds.add(2L);
+
+        when(projectRepo.findById(project.getId())).thenReturn(Optional.of(project));
+
+        when(projectUserRepo.findAllUserIdsByProjectId(project.getId())).thenReturn(userIds);
+
+        List<Long> result = projectUserServiceImpl.getUserIdsByProjectId(project.getId());
+
+        assertNotNull(result);
+        assertIterableEquals(userIds, result);
+
+        verify(projectRepo, times(1)).findById(project.getId());
+        verify(projectUserRepo, times(1)).findAllUserIdsByProjectId(project.getId());
+    }
+
+    @Test
+    void testProjectNotFound(){
+
+        when(projectRepo.findById(project.getId())).thenReturn(Optional.empty());
+
+        assertThrows(ProjectNotFoundException.class, ()-> projectUserServiceImpl.getUserIdsByProjectId(project.getId()));
+
+        verify(projectRepo, times(1)).findById(project.getId());
+        verify(projectUserRepo, never()).findAllUserIdsByProjectId(project.getId());
     }
 
 }
