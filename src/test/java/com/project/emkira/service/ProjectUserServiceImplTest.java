@@ -156,4 +156,22 @@ public class ProjectUserServiceImplTest {
         verify(projectUserRepo, times(1)).findAllAccountNamesByProjectId(project.getId());
     }
 
+    @Test
+    void testGetUserCountByProjectId(){
+
+        Long size = 3L;
+
+        when(projectRepo.findById(project.getId())).thenReturn(Optional.of(project));
+
+        when(projectUserRepo.findUserCountByProjectId(project.getId())).thenReturn(size);
+
+        Long result = projectUserServiceImpl.getUserCountByProjectId(project.getId());
+
+        assertNotNull(result);
+        assertEquals(size, result);
+
+        verify(projectRepo, times(1)).findById(project.getId());
+        verify(projectUserRepo, times(1)).findUserCountByProjectId(project.getId());
+    }
+
 }
