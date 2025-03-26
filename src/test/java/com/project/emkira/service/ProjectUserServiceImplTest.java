@@ -137,4 +137,23 @@ public class ProjectUserServiceImplTest {
         verify(projectUserRepo, never()).findAllUserIdsByProjectId(project.getId());
     }
 
+    @Test
+    void testGetAccountNameByProjectId(){
+
+        // better than creating new arrayList<>() since this is more readable and list is immutable
+        List<String> accountNames = List.of("User1", "User2");
+
+        when(projectRepo.findById(project.getId())).thenReturn(Optional.of(project));
+
+        when(projectUserRepo.findAllAccountNamesByProjectId(project.getId())).thenReturn(accountNames);
+
+        List<String> result = projectUserServiceImpl.getAccountNamesByProjectId(project.getId());
+
+        assertNotNull(result);
+        assertIterableEquals(accountNames, result);
+
+        verify(projectRepo, times(1)).findById(project.getId());
+        verify(projectUserRepo, times(1)).findAllAccountNamesByProjectId(project.getId());
+    }
+
 }
