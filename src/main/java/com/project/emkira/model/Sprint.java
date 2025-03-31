@@ -1,5 +1,6 @@
 package com.project.emkira.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,12 +33,15 @@ public class Sprint {
 
     // One sprint contains multiple stories, tasks and bugs
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Story> stories = new ArrayList<>();
 
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Task> tasks = new ArrayList<>(); // Tasks that are independent of Stories
 
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Bug> bugs = new ArrayList<>();
 
 }
