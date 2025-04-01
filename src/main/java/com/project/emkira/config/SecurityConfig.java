@@ -30,7 +30,16 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll() // Allow public authentication routes
+                        .requestMatchers("/api/v1/auth/register",
+                                "/api/v1/auth/login",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/v3/api-docs.yaml"
+                        )
+                        .permitAll() // Allow public authentication routes
                         .anyRequest().authenticated() // Secure all other routes
                 )
                 .sessionManagement(session -> session
