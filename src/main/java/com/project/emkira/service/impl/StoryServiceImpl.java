@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class StoryServiceImpl implements StoryService {
 
@@ -119,5 +121,21 @@ public class StoryServiceImpl implements StoryService {
         }
 
         return null;
+    }
+
+    @Override
+    public List<Story> getStoryByEpicId(Long epicId) {
+
+        if(epicRepo.findById(epicId).isEmpty()) {
+
+            throw new ProjectNotFoundException("Epic not found");
+        }
+
+        return storyRepo.findByEpicId(epicId);
+    }
+
+    @Override
+    public List<Story> getAllStories() {
+        return storyRepo.findAll();
     }
 }

@@ -4,10 +4,9 @@ import com.project.emkira.dto.StoryRequest;
 import com.project.emkira.model.Story;
 import com.project.emkira.service.StoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/stories")
@@ -24,5 +23,17 @@ public class StoryController {
     public Story addStory(@RequestBody StoryRequest request) {
 
         return storyService.addStory(request);
+    }
+
+    @GetMapping("/{epicId}")
+    public List<Story> getStoryByEpicId(@PathVariable Long epicId){
+
+        return storyService.getStoryByEpicId(epicId);
+    }
+
+    @GetMapping("/findAll")
+    public List<Story> getAllStories(){
+
+        return storyService.getAllStories();
     }
 }
