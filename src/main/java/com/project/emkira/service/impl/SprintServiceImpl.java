@@ -1,6 +1,7 @@
 package com.project.emkira.service.impl;
 
 import com.project.emkira.exception.ProjectNotFoundException;
+import com.project.emkira.model.Project;
 import com.project.emkira.model.Sprint;
 import com.project.emkira.repo.ProjectRepo;
 import com.project.emkira.repo.SprintRepo;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SprintServiceImpl implements SprintService {
@@ -31,7 +33,11 @@ public class SprintServiceImpl implements SprintService {
             throw new ProjectNotFoundException("Project not found");
         }
 
-        sprint.setProject(projectRepo.findById(projectId).get());
+        Optional<Project> project = projectRepo.findById(projectId);
+
+        if(project.isPresent()){
+            sprint.setProject(project.get());
+        }
 
         return sprintRepo.save(sprint);
     }

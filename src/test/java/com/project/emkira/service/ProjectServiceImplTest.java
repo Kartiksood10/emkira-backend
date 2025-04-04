@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 // Assert (verify output or exception) -> assert and verify is applied
 
 @ExtendWith(MockitoExtension.class)
-public class ProjectServiceImplTest {
+class ProjectServiceImplTest {
 
     // Mock projectRepo so that we do not access database for testing
     @Mock

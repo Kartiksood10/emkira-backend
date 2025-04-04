@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProjectUserServiceImplTest {
+class ProjectUserServiceImplTest {
 
     @Mock
     private ProjectRepo projectRepo;
@@ -97,7 +97,11 @@ public class ProjectUserServiceImplTest {
 
         when(projectUserRepo.findByUserIdAndProjectId(user.getId(), project.getId())).thenReturn(Optional.of(projectUser));
 
-        assertThrows(UserEnrolledException.class, () -> projectUserServiceImpl.enrollUserInProject(project.getId(), user.getId(), "DEVELOPER"));
+        Long projectId = project.getId();
+        Long userId = user.getId();
+
+        assertThrows(UserEnrolledException.class,
+                () -> projectUserServiceImpl.enrollUserInProject(projectId, userId, "DEVELOPER"));
 
         verify(projectRepo, times(1)).findById(project.getId());
         verify(userRepo, times(1)).findById(user.getId());
@@ -131,7 +135,9 @@ public class ProjectUserServiceImplTest {
 
         when(projectRepo.findById(project.getId())).thenReturn(Optional.empty());
 
-        assertThrows(ProjectNotFoundException.class, ()-> projectUserServiceImpl.getUserIdsByProjectId(project.getId()));
+        Long projectId = project.getId();
+
+        assertThrows(ProjectNotFoundException.class, ()-> projectUserServiceImpl.getUserIdsByProjectId(projectId));
 
         verify(projectRepo, times(1)).findById(project.getId());
         verify(projectUserRepo, never()).findAllUserIdsByProjectId(project.getId());
