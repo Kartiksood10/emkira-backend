@@ -12,4 +12,6 @@ public interface StoryService {
     List<Story> getStoryByEpicId(Long epicId);
 
     List<Story> getAllStories();
+
+    List<Story> getStoryBySprintId(Long sprintId);
 }

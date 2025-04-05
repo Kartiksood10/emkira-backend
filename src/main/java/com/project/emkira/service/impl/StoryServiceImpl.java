@@ -138,4 +138,15 @@ public class StoryServiceImpl implements StoryService {
     public List<Story> getAllStories() {
         return storyRepo.findAll();
     }
+
+    @Override
+    public List<Story> getStoryBySprintId(Long sprintId) {
+
+        if(sprintRepo.findById(sprintId).isEmpty()) {
+
+            throw new ProjectNotFoundException("Sprint not found");
+        }
+
+        return storyRepo.findBySprintId(sprintId);
+    }
 }

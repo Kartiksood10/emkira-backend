@@ -25,7 +25,7 @@ public class StoryController {
         return storyService.addStory(request);
     }
 
-    @GetMapping("/{epicId}")
+    @GetMapping("/{epicId}/epic")
     public List<Story> getStoryByEpicId(@PathVariable Long epicId){
 
         return storyService.getStoryByEpicId(epicId);
@@ -35,5 +35,11 @@ public class StoryController {
     public List<Story> getAllStories(){
 
         return storyService.getAllStories();
+    }
+
+    @GetMapping("/{sprintId}/sprint")
+    public List<Story> getStoryBySprintId(@PathVariable Long sprintId){
+
+        return storyService.getStoryBySprintId(sprintId);
     }
 }

@@ -12,4 +12,7 @@ public interface StoryRepo extends JpaRepository<Story, Long> {
 
     @Query("SELECT s FROM Story s WHERE s.epic.id = :epicId")
     List<Story> findByEpicId(Long epicId);
+
+    @Query("SELECT s FROM Story s WHERE s.sprint.id = :sprintId")
+    List<Story> findBySprintId(Long sprintId);
 }
