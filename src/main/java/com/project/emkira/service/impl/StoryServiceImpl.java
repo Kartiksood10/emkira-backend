@@ -149,4 +149,18 @@ public class StoryServiceImpl implements StoryService {
 
         return storyRepo.findBySprintId(sprintId);
     }
+
+    @Override
+    public void updateStatus(Story.Status status, Long id) {
+
+        int updatedRows = storyRepo.updateStatus(status, id);
+        if (updatedRows == 1) {
+
+            logger.info("Story status updated successfully");
+        }
+        else{
+
+            logger.error("Story status not updated");
+        }
+    }
 }

@@ -42,4 +42,12 @@ public class StoryController {
 
         return storyService.getStoryBySprintId(sprintId);
     }
+
+    @PutMapping("/{id}/status")
+    // Request param eg : http://localhost:8080/api/v1/stories/1/status?status=TO_DO
+    // key = status value = TO_DO
+    public void updateStatus(@PathVariable Long id, @RequestParam Story.Status status){
+
+        storyService.updateStatus(status, id);
+    }
 }

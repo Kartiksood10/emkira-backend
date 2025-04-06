@@ -14,4 +14,6 @@ public interface StoryService {
     List<Story> getAllStories();
 
     List<Story> getStoryBySprintId(Long sprintId);
+
+    void updateStatus(Story.Status status, Long id);
 }
