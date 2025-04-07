@@ -163,4 +163,15 @@ public class StoryServiceImpl implements StoryService {
             logger.error("Story status not updated");
         }
     }
+
+    @Override
+    public Long getTotalStoryPointsPerSprint(Long sprintId) {
+
+        if(sprintRepo.findById(sprintId).isEmpty()) {
+
+            throw new ProjectNotFoundException("Sprint not found");
+        }
+
+        return storyRepo.findTotalStoryPointsBySprintId(sprintId);
+    }
 }

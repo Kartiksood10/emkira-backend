@@ -23,4 +23,7 @@ public interface StoryRepo extends JpaRepository<Story, Long> {
     @Query("UPDATE Story s SET s.status = :status WHERE s.id = :id")
     // int as it returns no.of rows affected
     int updateStatus(Story.Status status, Long id);
+
+    @Query("SELECT SUM(s.story_points) FROM Story s WHERE s.sprint.id = :sprintId")
+    Long findTotalStoryPointsBySprintId(Long sprintId);
 }

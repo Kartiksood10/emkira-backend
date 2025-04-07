@@ -50,4 +50,10 @@ public class StoryController {
 
         storyService.updateStatus(status, id);
     }
+
+    @GetMapping("/{sprintId}/storyPoints")
+    public Long getStoryPointsPerSprint(@PathVariable Long sprintId){
+
+        return storyService.getTotalStoryPointsPerSprint(sprintId);
+    }
 }
