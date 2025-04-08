@@ -174,4 +174,15 @@ public class StoryServiceImpl implements StoryService {
 
         return storyRepo.findTotalStoryPointsBySprintId(sprintId);
     }
+
+    @Override
+    public List<Story> getHighPriorityStoriesByAssignee(String assignee) {
+
+        if(userRepo.findByAccountName(assignee).isEmpty()) {
+
+            throw new UserNotFoundException("Assignee not found");
+        }
+
+        return storyRepo.findHighPriorityStoriesByAssignee(assignee);
+    }
 }

@@ -26,4 +26,7 @@ public interface StoryRepo extends JpaRepository<Story, Long> {
 
     @Query("SELECT SUM(s.story_points) FROM Story s WHERE s.sprint.id = :sprintId")
     Long findTotalStoryPointsBySprintId(Long sprintId);
+
+    @Query("SELECT s FROM Story s WHERE s.assignee = :assignee AND s.priority = 'HIGH' ")
+    List<Story> findHighPriorityStoriesByAssignee(String assignee);
 }

@@ -56,4 +56,10 @@ public class StoryController {
 
         return storyService.getTotalStoryPointsPerSprint(sprintId);
     }
+
+    @GetMapping("/assignee/priority")
+    public List<Story> getHighPriorityStoriesByAssignee(@RequestParam String assignee){
+
+        return storyService.getHighPriorityStoriesByAssignee(assignee);
+    }
 }

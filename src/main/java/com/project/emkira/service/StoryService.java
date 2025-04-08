@@ -18,4 +18,6 @@ public interface StoryService {
     void updateStatus(Story.Status status, Long id);
 
     Long getTotalStoryPointsPerSprint(Long sprintId);
+
+    List<Story> getHighPriorityStoriesByAssignee(String assignee);
 }
