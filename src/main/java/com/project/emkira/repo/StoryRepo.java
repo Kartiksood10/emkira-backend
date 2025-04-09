@@ -29,4 +29,9 @@ public interface StoryRepo extends JpaRepository<Story, Long> {
 
     @Query("SELECT s FROM Story s WHERE s.assignee = :assignee AND s.priority = 'HIGH' ")
     List<Story> findHighPriorityStoriesByAssignee(String assignee);
+
+    @Query("SELECT s.sprint.id, AVG(s.story_points) FROM Story s GROUP BY s.sprint.id")
+    // We use List<Object[]> when we are selecting multiple rows in the query (not using DTO)
+    // Output : [[1, 5.0], [2, 6.5]] -> sprint 1 average 5.0 and sprint 2 average 6.5
+    List<Object[]> averageStoryPointsBySprintId();
 }

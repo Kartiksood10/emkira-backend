@@ -20,4 +20,6 @@ public interface StoryService {
     Long getTotalStoryPointsPerSprint(Long sprintId);
 
     List<Story> getHighPriorityStoriesByAssignee(String assignee);
+
+    List<Object[]> averageStoryPointsBySprintId(Long sprintId);
 }

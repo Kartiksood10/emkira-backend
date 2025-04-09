@@ -62,4 +62,10 @@ public class StoryController {
 
         return storyService.getHighPriorityStoriesByAssignee(assignee);
     }
+
+    @GetMapping("/{sprintId}/averageStoryPoints")
+    public List<Object[]> getAverageStoryPointsPerSprint(@PathVariable Long sprintId){
+
+        return storyService.averageStoryPointsBySprintId(sprintId);
+    }
 }

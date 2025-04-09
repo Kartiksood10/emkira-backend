@@ -185,4 +185,14 @@ public class StoryServiceImpl implements StoryService {
 
         return storyRepo.findHighPriorityStoriesByAssignee(assignee);
     }
+
+    @Override
+    public List<Object[]> averageStoryPointsBySprintId(Long sprintId) {
+
+        if(sprintRepo.findById(sprintId).isEmpty()) {
+
+            throw new ProjectNotFoundException("Sprint not found");
+        }
+        return storyRepo.averageStoryPointsBySprintId();
+    }
 }
