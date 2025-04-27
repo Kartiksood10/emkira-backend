@@ -5,24 +5,35 @@ import com.project.emkira.exception.ProjectNotFoundException;
 import com.project.emkira.model.Project;
 import com.project.emkira.repo.ProjectRepo;
 import com.project.emkira.service.ProjectService;
+import com.project.emkira.util.RedisUtil;
+import io.lettuce.core.RedisCommandTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepo projectRepo;
 
+    private static final String PROJECTS_CACHE_KEY = "all_projects";
+
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
+    private final RedisUtil redisUtil;
+
     @Autowired
-    public ProjectServiceImpl(ProjectRepo projectRepo) {
+    public ProjectServiceImpl(ProjectRepo projectRepo, RedisUtil redisUtil) {
         this.projectRepo = projectRepo;
+        this.redisUtil = redisUtil;
     }
 
     @Override
@@ -30,13 +41,52 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepo.save(project);
     }
 
-    @Cacheable(value = "Projects")
+    // @Cacheable(value = "Projects")
     @Override
     public List<Project> getAllProjects() {
+        try {
+            // Attempt to fetch data from redis cache
+            List<Project> cachedProjects = redisUtil.get(PROJECTS_CACHE_KEY);
 
-        logger.info("Fetching all projects from DB");
+            if (cachedProjects != null) {
+                logger.info("Cache hit! Returning data from Redis");
+                return cachedProjects;
+            }
+
+            logger.info("Cache miss! Fetching data from Database...");
+            // fetching data from db to add into redis
+            List<Project> projectsDB = projectRepo.findAll();
+
+            // Async cache population while data is retrieved by DB
+            CompletableFuture.runAsync(() -> {
+                try {
+                    logger.info("Adding data into Redis");
+                    redisUtil.set(PROJECTS_CACHE_KEY, projectsDB, Duration.ofSeconds(200));
+                    logger.info("Async cache update successful for key: {}", PROJECTS_CACHE_KEY);
+                } catch (RedisConnectionFailureException | RedisSystemException |
+                         RedisCommandTimeoutException redisEx) {
+                    logger.warn("Redis is unavailable. Proceeding with DB fetch. Error: {}", redisEx.getMessage());
+                } catch (Exception ex) {
+                    logger.error("Unexpected error during async cache update: {}", ex.getMessage());
+                }
+            });
+
+            // Returning data from DB immediately while cache is updated asynchronously
+            logger.info("Returning data immediately from DB while cache update");
+            return projectsDB;
+
+        } catch (RedisConnectionFailureException | RedisSystemException |
+                 RedisCommandTimeoutException redisEx) {
+            logger.warn("Redis is unavailable. Proceeding with DB: {}", redisEx.getMessage());
+        } catch (Exception ex) {
+            logger.error("Unexpected error while accessing Redis cache: {}", ex.getMessage());
+        }
+
+        // Fallback: Redis failed, so fetch directly from DB
+        logger.info("Returning data from DB due to Redis failure");
         return projectRepo.findAll();
     }
+
 
     // key is the parameter present in the function which redis uses to store data
     @Cacheable(value = "Project Name", key = "#projectName")
