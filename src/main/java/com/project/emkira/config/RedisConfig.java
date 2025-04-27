@@ -1,5 +1,6 @@
 package com.project.emkira.config;
 
+import com.project.emkira.model.Project;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.List;
 
 @Configuration
 @EnableCaching
@@ -34,6 +36,11 @@ public class RedisConfig {
     }
 
     // RedisTemplate for manual Redis access (opsForValue, etc.)
+    // redisTemplate.opsForValue().get(YOUR_KEY) - get data from redis
+    // redisTemplate.opsForValue().set(YOUR_KEY, data) - set data in redis
+    // RedisTemplate<String, Object> for all types of data
+    // String = key type (all cache keys will be strings)
+    // Object = value type (can be any Java object)
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
@@ -51,6 +58,24 @@ public class RedisConfig {
         template.afterPropertiesSet();
         return template;
     }
+
+//    // Type specific RedisTemplate for List<Project>
+//    @Bean
+//    public RedisTemplate<String, List<Project>> projectRedisTemplate(RedisConnectionFactory connectionFactory) {
+//        RedisTemplate<String, List<Project>> template = new RedisTemplate<>();
+//        template.setConnectionFactory(connectionFactory);
+//
+//        GenericJackson2JsonRedisSerializer valueSerializer = new GenericJackson2JsonRedisSerializer();
+//
+//        template.setKeySerializer(new StringRedisSerializer());
+//        template.setValueSerializer(valueSerializer);
+//        template.setHashKeySerializer(new StringRedisSerializer());
+//        template.setHashValueSerializer(valueSerializer);
+//
+//        template.afterPropertiesSet();
+//        return template;
+//    }
+
 
     // StringRedisTemplate for simple string-based operations (string keys and values)
     @Bean
