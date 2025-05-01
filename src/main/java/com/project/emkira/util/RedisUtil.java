@@ -32,5 +32,9 @@ public class RedisUtil {
         Object value = redisTemplate.opsForValue().get(key);
         return value != null ? (T) value : null;
     }
+
+    public void delete(String key) {
+        redisTemplate.delete(key);
+    }
 }
 

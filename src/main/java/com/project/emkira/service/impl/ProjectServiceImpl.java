@@ -106,12 +106,15 @@ public class ProjectServiceImpl implements ProjectService {
         if(projectRepo.existsById(id)) {
 
             projectRepo.deleteById(id);
+            redisUtil.delete(PROJECTS_CACHE_KEY);
             return "Project with id '" + id + "' deleted successfully";
         }
 
         throw new ProjectNotFoundException("Project with id '" + id + "' not found");
     }
 
+    // @CachePut(value = "projects", key = "#id")
+    // @CacheEvict(value = "projectsCache", key = "'all_projects'")
     @Override
     public Project updateProject(Long id, Project projectDetails) {
         Project existingProject = projectRepo.findById(id)
@@ -120,6 +123,9 @@ public class ProjectServiceImpl implements ProjectService {
         existingProject.setManager(projectDetails.getManager());
         existingProject.setName(projectDetails.getName());
         existingProject.setType(projectDetails.getType());
+
+        redisUtil.delete(PROJECTS_CACHE_KEY);
+        logger.info("Deleted Redis cache for key: {}", PROJECTS_CACHE_KEY);
 
         return projectRepo.save(existingProject);
     }
