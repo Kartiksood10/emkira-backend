@@ -10,7 +10,6 @@ import io.lettuce.core.RedisCommandTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.stereotype.Service;
@@ -89,15 +88,43 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     // key is the parameter present in the function which redis uses to store data
-    @Cacheable(value = "Project Name", key = "#projectName")
+    // @Cacheable(value = "Project Name", key = "#projectName")
     @Override
     public Project getProjectByName(String projectName) {
-        // This will be logged when the data is fetched from the database
-        logger.info("Fetching project with name '{}' from the database", projectName);
 
-        // Simulate DB call and return project
-        return projectRepo.findByName(projectName)
-                .orElseThrow(() -> new ProjectNotFoundException("Project with name '" + projectName + "' not found"));
+        Project cachedProject = redisUtil.get("project_name_key");
+        try{
+            if(cachedProject != null) {
+                logger.info("Cache hit! Returning project from Cache");
+                return cachedProject;
+            }
+
+            logger.info("Cache miss! Fetching data from Database");
+            Project projectFromDb = projectRepo.findByName(projectName)
+                    .orElseThrow(() -> new ProjectNotFoundException(projectName));
+
+            // Separate thread runs this asynchronously
+            CompletableFuture.runAsync(() -> {
+                try{
+                    redisUtil.set("project_name_key", projectFromDb, Duration.ofSeconds(200));
+                    logger.info("Async cache updated successfully");
+                } catch(RedisCommandTimeoutException | RedisConnectionFailureException | RedisSystemException ex) {
+                    logger.error("Redis is unavailable. Proceeding with DB fetch. Error: {}", ex.getMessage());
+                }
+                catch (Exception e) {
+                    logger.error("Unexpected error during async cache fetch: {}", e.getMessage());
+                }
+            });
+            logger.info("Returning project immediately from DB");
+            // After line 103, a separate thread directly returns data from DB
+            return projectFromDb;
+
+        } catch (Exception e) {
+            logger.error("Error occurred while accessing Redis cache: {}", e.getMessage());
+        }
+
+        logger.info("Returning project from DB due to Redis failure");
+        return projectRepo.findByName(projectName).orElseThrow(() -> new ProjectNotFoundException(projectName));
     }
 
     @Override
