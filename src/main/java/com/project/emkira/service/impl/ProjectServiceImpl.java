@@ -37,6 +37,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project addProject(Project project) {
+        redisUtil.delete(PROJECTS_CACHE_KEY);
         return projectRepo.save(project);
     }
 
