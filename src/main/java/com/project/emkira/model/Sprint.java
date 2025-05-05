@@ -27,6 +27,13 @@ public class Sprint {
 
     private LocalDate endDate;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    public enum Status {
+        ONGOING, COMPLETED
+    }
+
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
