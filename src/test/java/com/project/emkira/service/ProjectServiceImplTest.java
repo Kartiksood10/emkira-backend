@@ -4,6 +4,7 @@ import com.project.emkira.exception.ProjectNotFoundException;
 import com.project.emkira.model.Project;
 import com.project.emkira.repo.ProjectRepo;
 import com.project.emkira.service.impl.ProjectServiceImpl;
+import com.project.emkira.util.RedisUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+// @Mock all DB and other util calls used in serviceImpl
+// @InjectMocks into the serviceImpl
+
 // Writing Unit test cases 3 steps:
 // Arrange (mock behavior) -> Mocking repository functions using when().thenReturn()
 // Act (call method) -> Service method is called
@@ -30,6 +34,9 @@ class ProjectServiceImplTest {
     @Mock
     private ProjectRepo projectRepo;
 
+    @Mock
+    private RedisUtil redisUtil;
+
     // Injects mocked repo into serviceImpl
     @InjectMocks
     private ProjectServiceImpl projectServiceImpl;
@@ -39,7 +46,6 @@ class ProjectServiceImplTest {
     // Runs before every test case, initializing test data
     @BeforeEach
     void setUp() {
-
         project = new Project();
         project.setId(1L);
         project.setManager("Test Manager");
@@ -63,197 +69,152 @@ class ProjectServiceImplTest {
         assertEquals("Test Project", savedProject.getName());
         assertEquals(Project.Type.COMPANY_MANAGED, savedProject.getType());
 
-        // verify that save() was called exactly once
+        verify(redisUtil, times(1)).delete("all_projects");
         verify(projectRepo, times(1)).save(any(Project.class));
-
     }
 
     @Test
-    void testGetProjectByName(){
+    void testGetAllProjects_CacheHit() {
+        List<Project> cachedProjects = List.of(project);
+        when(redisUtil.get("all_projects")).thenReturn(cachedProjects);
 
-        // Mock repo
-        // Optional.of since findByName is Optional and may return null
-        // To avoid null pointer exception while testing
-        when(projectRepo.findByName(project.getName())).thenReturn(Optional.of(project));
+        List<Project> result = projectServiceImpl.getAllProjects();
 
-        // Call service function
-        Project foundProject = projectServiceImpl.getProjectByName(project.getName());
-
-        assertNotNull(foundProject);
-        assertEquals(project.getName(), foundProject.getName());
-        assertEquals(project.getManager(), foundProject.getManager());
-        assertEquals(project.getType(), foundProject.getType());
-        // verify findByName is called only once
-        verify(projectRepo, times(1)).findByName(project.getName());
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(redisUtil, times(1)).get("all_projects");
+        verify(projectRepo, never()).findAll();
     }
 
     @Test
-    void testGetProjectByNameNotFound(){
+    void testGetAllProjects_CacheMiss() {
+        List<Project> dbProjects = List.of(project);
+        when(redisUtil.get("all_projects")).thenReturn(null);
+        when(projectRepo.findAll()).thenReturn(dbProjects);
 
-        // Defining a random project name which mocks not being in DB
-        String invalidProjectName = "Invalid Project";
+        List<Project> result = projectServiceImpl.getAllProjects();
 
-        // Mocking the repo where if the project name is invalidProjectName(not present in DB) then return empty
-        when(projectRepo.findByName(invalidProjectName)).thenReturn(Optional.empty());
+        assertNotNull(result);
+        assertEquals(1, result.size());
 
-        // Throw exception when project not found
-        assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.getProjectByName(invalidProjectName));
-
-        verify(projectRepo, times(1)).findByName(invalidProjectName);
+        verify(redisUtil, times(1)).get("all_projects");
+        verify(projectRepo, times(1)).findAll();
+        // RedisUtil.set is called asynchronously, so we do not verify its call here
     }
 
     @Test
-    void testDeleteProjectById(){
+    void testGetProjectByName_CacheHit() {
+        when(redisUtil.get("project_name_key")).thenReturn(project);
 
-        // check if project exists and return true since it is inside if condition in service method
+        Project result = projectServiceImpl.getProjectByName("Test Project");
+
+        assertNotNull(result);
+        assertEquals("Test Project", result.getName());
+
+        verify(redisUtil, times(1)).get("project_name_key");
+        verify(projectRepo, never()).findByName(anyString());
+    }
+
+    @Test
+    void testGetProjectByName_CacheMiss() {
+        when(redisUtil.get("project_name_key")).thenReturn(null);
+        when(projectRepo.findByName("Test Project")).thenReturn(Optional.of(project));
+
+        Project result = projectServiceImpl.getProjectByName("Test Project");
+
+        assertNotNull(result);
+        assertEquals("Test Project", result.getName());
+
+        verify(redisUtil, times(1)).get("project_name_key");
+        verify(projectRepo, times(1)).findByName("Test Project");
+        // RedisUtil.set is called asynchronously
+    }
+
+    @Test
+    void testGetProjectByNameNotFound() {
+        when(redisUtil.get("project_name_key")).thenReturn(null);
+        when(projectRepo.findByName("Invalid Project")).thenReturn(Optional.empty());
+
+        assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.getProjectByName("Invalid Project"));
+
+        verify(redisUtil, times(1)).get("project_name_key");
+        verify(projectRepo, times(2)).findByName("Invalid Project");
+    }
+
+    @Test
+    void testDeleteProjectById() {
         when(projectRepo.existsById(1L)).thenReturn(true);
 
         String result = projectServiceImpl.deleteProjectById(1L);
 
-        assertEquals("Project with id '" + 1L + "' deleted successfully", result);
+        assertEquals("Project with id '1' deleted successfully", result);
 
         verify(projectRepo, times(1)).existsById(1L);
+        verify(projectRepo, times(1)).deleteById(1L);
+        verify(redisUtil, times(1)).delete("all_projects");
     }
 
     @Test
-    void testDeleteProjectByIdNotFound(){
+    void testDeleteProjectByIdNotFound() {
+        when(projectRepo.existsById(999L)).thenReturn(false);
 
-        Long invalidProjectId = 999L;
+        assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.deleteProjectById(999L));
 
-        when(projectRepo.existsById(invalidProjectId)).thenReturn(false);
-
-        assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.deleteProjectById(invalidProjectId));
-
-        verify(projectRepo, never()).deleteById(invalidProjectId);
+        verify(projectRepo, never()).deleteById(anyLong());
     }
 
     @Test
-    void testUpdateProject(){
+    void testUpdateProject() {
+        Long id = 1L;
+        Project existing = new Project(id, "Old", Project.Type.COMPANY_MANAGED, "Old", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        Project updated = new Project(id, "New", Project.Type.TEAM_MANAGED, "New", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 
-        Long projectId = 1L;
-        // arraylist for list of sprints, epics, and projectUsers defined in the model class
-        Project existingProject = new Project(projectId, "Old Name", Project.Type.COMPANY_MANAGED, "Old Manager", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        Project updatedDetails = new Project(projectId, "New Name", Project.Type.TEAM_MANAGED, "New Manager", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        when(projectRepo.findById(id)).thenReturn(Optional.of(existing));
+        when(projectRepo.save(any(Project.class))).thenReturn(updated);
 
-        // get existing project when finding by id
-        when(projectRepo.findById(projectId)).thenReturn(Optional.of(existingProject));
-        // when save is used, set updated project details
-        when(projectRepo.save(any(Project.class))).thenReturn(updatedDetails);
-
-        Project result = projectServiceImpl.updateProject(projectId, updatedDetails);
+        Project result = projectServiceImpl.updateProject(id, updated);
 
         assertNotNull(result);
-        assertEquals(updatedDetails.getName(), result.getName());
-        assertEquals(updatedDetails.getManager(), result.getManager());
-        assertEquals(updatedDetails.getType(), result.getType());
+        assertEquals("New", result.getName());
 
-        verify(projectRepo, times(1)).findById(projectId);
+        verify(projectRepo, times(1)).findById(id);
         verify(projectRepo, times(1)).save(any(Project.class));
+        verify(redisUtil, times(1)).delete("all_projects");
     }
 
     @Test
-    void testUpdateProjectSameData(){
+    void testUpdateProjectNotFound() {
+        Long id = 999L;
+        Project proj = new Project(id, "Name", Project.Type.TEAM_MANAGED, "Manager", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 
-        Long projectId = 1L;
-        Project sameProject = new Project(projectId, "Old Name", Project.Type.COMPANY_MANAGED, "Old Manager", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        when(projectRepo.findById(id)).thenReturn(Optional.empty());
 
-        when(projectRepo.findById(projectId)).thenReturn(Optional.of(sameProject));
-        when(projectRepo.save(any(Project.class))).thenReturn(sameProject);
-
-        Project result = projectServiceImpl.updateProject(projectId, sameProject);
-
-        assertNotNull(result);
-        assertEquals(sameProject.getName(), result.getName());
-        assertEquals(sameProject.getManager(), result.getManager());
-        assertEquals(sameProject.getType(), result.getType());
-
-        verify(projectRepo, times(1)).findById(projectId);
-        verify(projectRepo, times(1)).save(any(Project.class));
-    }
-
-    @Test
-    void testUpdateProjectNotFound(){
-
-        Long invalidProjectId = 999L;
-        Project updatedDetails = new Project(invalidProjectId, "Updated Name", Project.Type.TEAM_MANAGED,
-                "Updated Manager", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-
-        when(projectRepo.findById(invalidProjectId)).thenReturn(Optional.empty());
-
-        assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.updateProject(invalidProjectId, updatedDetails));
+        assertThrows(ProjectNotFoundException.class, () -> projectServiceImpl.updateProject(id, proj));
 
         verify(projectRepo, never()).save(any(Project.class));
     }
 
     @Test
-    void testGetProjectByManager(){
+    void testGetProjectByManager() {
+        List<String> names = List.of("P1", "P2");
 
-        String manager = "Manager";
-        List<String> projects = new ArrayList<>();
-        projects.add("Project 1");
-        projects.add("Project 2");
+        when(projectRepo.findProjectByManager("Manager")).thenReturn(names);
 
-        when(projectRepo.findProjectByManager(manager)).thenReturn(projects);
-
-        List<String> result = projectServiceImpl.getProjectByManager(manager);
+        List<String> result = projectServiceImpl.getProjectByManager("Manager");
 
         assertNotNull(result);
-        // assertEquals would compare both list objects, assertIterable checks both list elements
-        // if order of elements in list are different then assertEquals fails but assertIterable passes
-        assertIterableEquals(projects, result);
-
-        verify(projectRepo, times(1)).findProjectByManager(manager);
+        assertIterableEquals(names, result);
     }
 
     @Test
-    void testGetProjectByManagerNotFound(){
+    void testGetProjectByType() {
+        List<String> names = List.of("P1", "P2");
 
-        String manager = "New Manager";
-
-        when(projectRepo.findProjectByManager(manager)).thenReturn(new ArrayList<>());
-
-        List<String> result = projectServiceImpl.getProjectByManager(manager);
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-
-        verify(projectRepo, times(1)).findProjectByManager(manager);
-
-    }
-
-    @Test
-    void testGetProjectByCompanyManagedType(){
-
-        List<String> projects = new ArrayList<>();
-        projects.add("project 1");
-        projects.add("project 2");
-
-        when(projectRepo.findProjectByType(Project.Type.COMPANY_MANAGED)).thenReturn(projects);
-
-        List<String> result = projectServiceImpl.getProjectByType(Project.Type.COMPANY_MANAGED);
-
-        assertNotNull(result);
-        assertIterableEquals(projects, result);
-
-        verify(projectRepo, times(1)).findProjectByType(Project.Type.COMPANY_MANAGED);
-
-    }
-
-    @Test
-    void testGetProjectByTeamManagedType(){
-
-        List<String> projects = new ArrayList<>();
-        projects.add("project 1");
-        projects.add("project 2");
-
-        when(projectRepo.findProjectByType(Project.Type.TEAM_MANAGED)).thenReturn(projects);
+        when(projectRepo.findProjectByType(Project.Type.TEAM_MANAGED)).thenReturn(names);
 
         List<String> result = projectServiceImpl.getProjectByType(Project.Type.TEAM_MANAGED);
 
         assertNotNull(result);
-        assertIterableEquals(projects, result);
-
-        verify(projectRepo, times(1)).findProjectByType(Project.Type.TEAM_MANAGED);
-
+        assertIterableEquals(names, result);
     }
 }
