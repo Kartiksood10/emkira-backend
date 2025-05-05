@@ -9,4 +9,6 @@ public interface SprintService {
     Sprint addSprint(Sprint sprint, Long projectId);
 
     List<String> getSprintListByProjectId(Long projectId);
+
+    List<Sprint> getSprintsByMonth(String month);
 }

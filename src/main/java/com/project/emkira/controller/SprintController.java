@@ -29,4 +29,10 @@ public class SprintController {
 
         return sprintService.getSprintListByProjectId(projectId);
     }
+
+    @GetMapping("/{month}")
+    public List<Sprint> getSprintsByMonth(@PathVariable String month) {
+
+        return sprintService.getSprintsByMonth(month);
+    }
 }

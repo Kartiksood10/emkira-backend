@@ -51,4 +51,10 @@ public class SprintServiceImpl implements SprintService {
         }
         return sprintRepo.findSprintNamesByProjectId(projectId);
     }
+
+    @Override
+    public List<Sprint> getSprintsByMonth(String month) {
+
+        return sprintRepo.findSprintsByMonth(month);
+    }
 }
