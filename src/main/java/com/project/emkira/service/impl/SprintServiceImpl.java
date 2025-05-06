@@ -28,16 +28,13 @@ public class SprintServiceImpl implements SprintService {
     @Override
     public Sprint addSprint(Sprint sprint, Long projectId) {
 
-        if(projectRepo.findById(projectId).isEmpty()){
+        Optional<Project> project = projectRepo.findById(projectId);
+        if(project.isEmpty()){
 
             throw new ProjectNotFoundException("Project not found");
         }
 
-        Optional<Project> project = projectRepo.findById(projectId);
-
-        if(project.isPresent()){
-            sprint.setProject(project.get());
-        }
+        sprint.setProject(project.get());
 
         return sprintRepo.save(sprint);
     }
