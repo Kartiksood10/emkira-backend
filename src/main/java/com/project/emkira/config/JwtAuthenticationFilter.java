@@ -19,6 +19,8 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
+// @Component tells spring to register this class a bean in the application context
+// We use component annotation when we want to inject this class in another class using Autowired
 @Component
 // Authentication middleware to retrieve jwt token in the header authorization and validate it
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
