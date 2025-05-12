@@ -5,6 +5,7 @@ import com.project.emkira.dto.EpicStatusRequest;
 import com.project.emkira.exception.EpicNotFoundException;
 import com.project.emkira.exception.ProjectNotFoundException;
 import com.project.emkira.exception.UserNotFoundException;
+import com.project.emkira.mapper.EpicMapper;
 import com.project.emkira.model.Epic;
 import com.project.emkira.model.Project;
 import com.project.emkira.repo.EpicRepo;
@@ -26,15 +27,17 @@ public class EpicServiceImpl implements EpicService {
     private final UserRepo userRepo;
     private final ProjectUserRepo projectUserRepo;
     private final ProjectRepo projectRepo;
+    private final EpicMapper epicMapper;
 
     Logger logger = LoggerFactory.getLogger(EpicServiceImpl.class);
 
     @Autowired
-    public EpicServiceImpl(EpicRepo epicRepo, UserRepo userRepo, ProjectUserRepo projectUserRepo, ProjectRepo projectRepo) {
+    public EpicServiceImpl(EpicRepo epicRepo, UserRepo userRepo, ProjectUserRepo projectUserRepo, ProjectRepo projectRepo, EpicMapper epicMapper) {
         this.epicRepo = epicRepo;
         this.userRepo = userRepo;
         this.projectUserRepo = projectUserRepo;
         this.projectRepo = projectRepo;
+        this.epicMapper = epicMapper;
     }
 
     @Override
@@ -72,20 +75,22 @@ public class EpicServiceImpl implements EpicService {
             // Convert DTO to Entity
             // Epic Request is just for API request since we want assignee_id and reporter_id
             // Converting back to Entity since in db we store entity values
-            Epic epic = new Epic();
-            epic.setTitle(request.getTitle());
-            epic.setDescription(request.getDescription());
-            epic.setStatus(Epic.Status.valueOf(request.getStatus())); // Convert String to Enum
-            epic.setComment(request.getComment());
-            epic.setAssignee(request.getAssignee());
-            epic.setReporter(request.getReporter());
-            epic.setStory_points(request.getStoryPoints());
-            epic.setPriority(Epic.Priority.valueOf(request.getPriority())); // Convert String to Enum
-            epic.setEstimate(request.getEstimate());
+//            Epic epic = new Epic();
+//            epic.setTitle(request.getTitle());
+//            epic.setDescription(request.getDescription());
+//            epic.setStatus(Epic.Status.valueOf(request.getStatus())); // Convert String to Enum
+//            epic.setComment(request.getComment());
+//            epic.setAssignee(request.getAssignee());
+//            epic.setReporter(request.getReporter());
+//            epic.setStory_points(request.getStoryPoints());
+//            epic.setPriority(Epic.Priority.valueOf(request.getPriority())); // Convert String to Enum
+//            epic.setEstimate(request.getEstimate());
 
             Project project = projectRepo.findById(projectId)
                     .orElseThrow(() -> new IllegalArgumentException("Project not found"));
-            epic.setProject(project);
+
+            // Using mapper to convert dto back to entity
+            Epic epic = epicMapper.toEntity(request, project);
 
             return epicRepo.save(epic);
 

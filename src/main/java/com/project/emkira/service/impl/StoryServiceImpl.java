@@ -3,6 +3,7 @@ package com.project.emkira.service.impl;
 import com.project.emkira.dto.StoryRequest;
 import com.project.emkira.exception.ProjectNotFoundException;
 import com.project.emkira.exception.UserNotFoundException;
+import com.project.emkira.mapper.StoryMapper;
 import com.project.emkira.model.Epic;
 import com.project.emkira.model.Sprint;
 import com.project.emkira.model.Story;
@@ -24,17 +25,19 @@ public class StoryServiceImpl implements StoryService {
     private final UserRepo userRepo;
     private final ProjectUserRepo projectUserRepo;
     private final ProjectRepo projectRepo;
+    private final StoryMapper storyMapper;
 
     Logger logger = LoggerFactory.getLogger(StoryServiceImpl.class);
 
     @Autowired
-    public StoryServiceImpl(StoryRepo storyRepo, EpicRepo epicRepo, SprintRepo sprintRepo, UserRepo userRepo, ProjectUserRepo projectUserRepo, ProjectRepo projectRepo) {
+    public StoryServiceImpl(StoryRepo storyRepo, EpicRepo epicRepo, SprintRepo sprintRepo, UserRepo userRepo, ProjectUserRepo projectUserRepo, ProjectRepo projectRepo, StoryMapper storyMapper) {
         this.storyRepo = storyRepo;
         this.epicRepo = epicRepo;
         this.sprintRepo = sprintRepo;
         this.userRepo = userRepo;
         this.projectUserRepo = projectUserRepo;
         this.projectRepo = projectRepo;
+        this.storyMapper = storyMapper;
     }
 
     @Override
@@ -99,20 +102,22 @@ public class StoryServiceImpl implements StoryService {
                 throw new ProjectNotFoundException("Project IDs don't match for Story and Sprint");
             }
 
-            Story story = new Story();
-            story.setTitle(request.getTitle());
-            story.setDescription(request.getDescription());
-            story.setStatus(Story.Status.valueOf(request.getStatus()));
-            story.setComment(request.getComment());
-            story.setAssignee(request.getAssignee());
-            story.setReporter(request.getReporter());
-            story.setStory_points(request.getStoryPoints());
-            story.setPriority(Story.Priority.valueOf(request.getPriority()));
-            story.setEstimate(request.getEstimate());
+//            Story story = new Story();
+//            story.setTitle(request.getTitle());
+//            story.setDescription(request.getDescription());
+//            story.setStatus(Story.Status.valueOf(request.getStatus()));
+//            story.setComment(request.getComment());
+//            story.setAssignee(request.getAssignee());
+//            story.setReporter(request.getReporter());
+//            story.setStory_points(request.getStoryPoints());
+//            story.setPriority(Story.Priority.valueOf(request.getPriority()));
+//            story.setEstimate(request.getEstimate());
+//
+//            story.setSprint(sprint);
+//            story.setEpic(epic);
 
-            story.setSprint(sprint);
-            story.setEpic(epic);
-
+            // Using mapper to convert dto to entity
+            Story story = storyMapper.toEntity(request, epic, sprint);
             return storyRepo.save(story);
 
 
