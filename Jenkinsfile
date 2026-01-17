@@ -8,13 +8,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
-            steps {
-                git branch: 'master',
-                url: 'https://github.com/Kartiksood10/emkira-backend.git'
-            }
-        }
-
         stage('Build and Test') {
             steps {
                 sh 'mvn clean package'
