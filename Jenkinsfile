@@ -1,18 +1,12 @@
 pipeline {
     agent any
 
-            tools {
-                jdk 'JDK21'
-                maven 'Maven3'
-            }
+    tools {
+        jdk 'JDK21'
+        maven 'Maven3'
+    }
 
     stages {
-
-        stage('Clean Workspace') {
-             steps {
-                 deleteDir()
-            }
-        }
 
         stage('Build and Test') {
             steps {
@@ -22,20 +16,17 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh '''
-                    docker build -t emkira-backend:${BUILD_NUMBER} .
-                '''
+                sh "docker build -t emkira-backend:${BUILD_NUMBER} ."
             }
         }
-
     }
 
     post {
         success {
-            echo 'Build and tests passed successfully.'
+            echo 'CI pipeline successful: build, tests, and Docker image created.'
         }
         failure {
-            echo 'Build or tests failed. Check logs.'
+            echo 'CI pipeline failed. Check console logs.'
         }
     }
 }
