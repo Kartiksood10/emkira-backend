@@ -39,12 +39,13 @@ pipeline {
                 // Tag image as latest so docker-compose uses it
                 sh "docker tag emkira-backend:${BUILD_NUMBER} emkira-backend:latest"
 
-                // Stop currently running containers defined in docker-compose.yml
-                // Containers are removed but volumes (DB data) are preserved
+                // Force remove existing containers if they exist
+                sh "docker rm -f emkira-backend emkira-postgres emkira-redis || true"
+
+                // Clean compose-managed resources
                 sh "docker compose down --remove-orphans"
 
-                // Start containers again using updated Docker image
-                // Runs in detached mode (-d)
+                // Start fresh containers
                 sh "docker compose up -d"
             }
         }
