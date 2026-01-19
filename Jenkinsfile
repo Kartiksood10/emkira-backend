@@ -41,7 +41,7 @@ pipeline {
 
                 // Stop currently running containers defined in docker-compose.yml
                 // Containers are removed but volumes (DB data) are preserved
-                sh "docker compose down"
+                sh "docker compose down --remove-orphans"
 
                 // Start containers again using updated Docker image
                 // Runs in detached mode (-d)
