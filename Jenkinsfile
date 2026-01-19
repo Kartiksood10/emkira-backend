@@ -42,10 +42,10 @@ pipeline {
 
                 // Stop existing containers (backend, postgres, redis)
                 // Volumes are NOT removed, so DB data remains safe
-                sh "docker compose down"
+                sh "docker-compose down"
 
                 // Start containers again using updated Docker image
-                sh "docker compose up -d"
+                sh "docker-compose up -d"
             }
         }
     }
