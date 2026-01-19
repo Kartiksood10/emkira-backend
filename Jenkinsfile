@@ -36,16 +36,12 @@ pipeline {
         // =========================
         stage('Deploy Using Docker Compose') {
             steps {
-                // Tag the same image as 'latest' so docker-compose can use it
-                // This keeps the existing versioned tag AND supports deployment
+                // Tag image as latest so docker-compose uses it
                 sh "docker tag emkira-backend:${BUILD_NUMBER} emkira-backend:latest"
 
-                // Stop existing containers (backend, postgres, redis)
-                // Volumes are NOT removed, so DB data remains safe
-                sh "docker-compose down"
-
-                // Start containers again using updated Docker image
-                sh "docker-compose up -d"
+                // Use absolute path because Jenkins service does not have docker-compose in PATH
+                sh "\"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker-compose.exe\" down"
+                sh "\"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker-compose.exe\" up -d"
             }
         }
     }
