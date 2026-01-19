@@ -39,9 +39,13 @@ pipeline {
                 // Tag image as latest so docker-compose uses it
                 sh "docker tag emkira-backend:${BUILD_NUMBER} emkira-backend:latest"
 
-                // Use absolute path because Jenkins service does not have docker-compose in PATH
-                sh "\"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker-compose.exe\" down"
-                sh "\"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker-compose.exe\" up -d"
+                // Stop currently running containers defined in docker-compose.yml
+                // Containers are removed but volumes (DB data) are preserved
+                sh "docker compose down"
+
+                // Start containers again using updated Docker image
+                // Runs in detached mode (-d)
+                sh "docker compose up -d"
             }
         }
     }
