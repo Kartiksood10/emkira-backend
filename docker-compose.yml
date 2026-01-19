@@ -1,0 +1,90 @@
+services:
+
+  # =========================
+  # POSTGRES DATABASE SERVICE
+  # =========================
+  postgres:
+    # Official PostgreSQL image (version 15)
+    image: postgres:15
+
+    # Fixed container name for debugging and logs
+    container_name: emkira-postgres
+
+    # Automatically restart if container crashes or system restarts
+    restart: always
+
+    # Environment variables used by postgres image on first startup
+    environment:
+      POSTGRES_DB: emkira                 # Database name
+      POSTGRES_USER: emkira_user          # DB username
+      POSTGRES_PASSWORD: emkira_pass      # DB password
+
+    # Persist database data outside container lifecycle
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    # Expose PostgreSQL port to host (for DBeaver, psql, etc.)
+    ports:
+      - "5432:5432"
+
+
+  # =========================
+  # REDIS CACHE SERVICE
+  # =========================
+  redis:
+    # Official Redis image
+    image: redis:7
+
+    container_name: emkira-redis
+
+    restart: always
+
+    # Expose Redis port for debugging or local access
+    ports:
+      - "6379:6379"
+
+
+  # =========================
+  # SPRING BOOT BACKEND
+  # =========================
+  backend:
+    # Docker image built by Jenkins
+    # Jenkins always rebuilds this as :latest
+    image: emkira-backend:latest
+
+    container_name: emkira-backend
+
+    restart: always
+
+    # Ensure DB and Redis containers start first
+    depends_on:
+      - postgres
+      - redis
+
+    # Expose Spring Boot application
+    # Host:8085 → Container:8080
+    ports:
+      - "8085:8080"
+
+    # Environment variables injected into Spring Boot
+    environment:
+      # PostgreSQL connection
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/emkira
+      SPRING_DATASOURCE_USERNAME: emkira_user
+      SPRING_DATASOURCE_PASSWORD: emkira_pass
+
+      # Redis configuration
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+
+      # JWT secret used by Spring Security
+      # (In real production this should come from a secret manager)
+      SECURITY_JWT_SECRET_KEY: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
+
+
+# =========================
+# NAMED VOLUMES
+# =========================
+volumes:
+  # Volume used by PostgreSQL to persist data
+  pgdata:
